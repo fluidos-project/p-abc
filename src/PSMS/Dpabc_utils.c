@@ -18,6 +18,8 @@ void hash0(const Zp *m[], int mSize, Zp ** z, G2 ** g){
     *g=hashToG2(bytes,nBytes+TAG_length);
 }
 
+ //TODO Add domain separation in rest of methods See https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/
+
 Zp *hashPk(const publicKey * pk){
     int g1Bytes=g1ByteSize();
     int nBytes=g1Bytes*(pk->n+3);

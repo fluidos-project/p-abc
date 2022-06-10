@@ -57,7 +57,7 @@ add_cmocka_test(pabcTestCmocka
                 LINK_LIBRARIES dpabc_psms cmocka)
                 
 # Modifying output folders for libs/binaries
-set_target_properties(dpabc_example
+set_target_properties(dpabc_example dpabc_psms
 PROPERTIES
 ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib"
 LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib"

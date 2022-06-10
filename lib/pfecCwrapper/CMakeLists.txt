@@ -112,7 +112,7 @@ LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib/pfec_Miracl_Bls381_32
 RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/bin/pfec_Miracl_Bls381_32"
 )
 
-set_target_properties(${M_BLS381_64} example_test
+set_target_properties(${M_BLS381_64} 
 PROPERTIES
 ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib/pfec_Miracl_Bls381_64"
 LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib/pfec_Miracl_Bls381_64"
