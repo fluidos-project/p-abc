@@ -1,6 +1,6 @@
 # P-ABC
 
-P-ABC library (distributed privacy-preserving Attribute-Based Credentials based on [PS multisignatures](https://eprint.iacr.org/2020/016)) using wrapper library for EC arithmetic.
+P-ABC library (distributed privacy-preserving Attribute-Based Credentials based on [PS multisignatures](https://eprint.iacr.org/2020/016)) using wrapper library for [EC arithmetic](./lib/pfecCwrapper/README.md).
 
 
 ## Instalation and build
@@ -34,8 +34,24 @@ Once everything is built correctly, you can (verbosely) run the tests with the c
 ctest -V
 ```
 
+### Outputs
+An example binary with a simple protocol execution will be generated to *build/output/bin* directory. Additionally, a static library for the dpabc code will be generated to *build/output/lib*. 
+For convenience, the static library along with all the static libraries that it will need (i.e., wrapper ec library), are bundled into the file *build/libdpabc_psms_bundled.a*. 
+
+Remember that, in both cases, if you want to use the methods for these libraries in your code you need to include the respective headers (i.e., those in the *include* directories from both projects).
+
+For instance, if your *main.c* file (you can try it with the *src/example/main.c* from this project) uses the library, you may execute the following command (with each directory containing the corresponding files):
+```
+gcc.exe -I./include -I./include/ecwrapper main.c -L. -ldpabc_psms_bundled  
+```
+
+If you do not use the bundled library, you would need to include all the static libraries in the bundled directory:
+```
+ gcc.exe -I./include -I./include/ecwrapper main.c -L. -ldpabc_psms_bundled  -lpfec_Miracl_Bls381_64   -lcore_win  
+```
+
 ## Documentation
-You can genereta a documentation for the whole library by running ``doxygen'' in the docs folder
+You can genereta a documentation for the whole library by running *doxygen* in the docs folder
 
 
 ## Potential issues
