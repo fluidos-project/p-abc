@@ -39,6 +39,8 @@ void zpToBytes(char *res, const Zp *a);
  */
 Zp * zpFromBytes(const char *bytes);
 
+//TODO Add if possible generic ZpFromBigIntegerRepresentation or establish a method for doing this in documentation
+
 /**
  * @brief Construct a new Zp element, hashing from bytes. Has to be freed after usage
  * 

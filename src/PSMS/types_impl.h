@@ -7,7 +7,8 @@
 #include <g3.h>
 #include <stdint.h>
 
-//We use uint8_t for number of attributes, setting a maximum of 255 (it would be non-practical long before reaching that number)
+//We use uint8_t for number of attributes, setting a maximum of 255 
+//TODO It would be interesting to configure uint8 or uint16 depending on compilation parameter (e.g. with preprocessor if)
 
 struct secretKeyImpl{
     Zp *x;
