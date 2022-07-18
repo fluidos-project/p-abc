@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define CEIL(a,b) (((a)-1)/(b)+1)
+#define MULNBREAKPOINT 12 // Experimentally computed value, until this point naive n-multiplication is faster (may vary depending on deployment)
+
 
 // Methods for hashing from AMCL, following https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/, until they are fully integrated/standardized
 /*
@@ -118,6 +120,32 @@ void g1InvMul(G1* a, const Zp* b){
     BIG_384_58_rcopy(aux.z,b->z);
     zpNeg(&aux);
     ECP_BLS12381_mul(a->p,aux.z); 
+}
+
+G1* g1Muln(const G1* a[], const Zp* b[], int n){
+    G1 *r=malloc(sizeof(G1));
+    r->p=malloc(sizeof(ECP_BLS12381));
+    if(n<MULNBREAKPOINT){
+        ECP_BLS12381_copy(r->p,a[0]->p);
+        ECP_BLS12381_mul(r->p,b[0]->z); 
+        ECP_BLS12381 *aux=malloc(sizeof(ECP_BLS12381));
+        for(int i=1;i<n;i++){
+            ECP_BLS12381_copy(aux,a[i]->p);
+            ECP_BLS12381_mul(aux,b[i]->z); 
+            ECP_BLS12381_add(r->p,aux);
+        }
+        return r;
+    }
+    ECP_BLS12381* aecp=malloc(n*sizeof(ECP_BLS12381));
+    BIG_384_58* bbig=malloc(n*sizeof(BIG_384_58));
+    for(int i=0;i<n;i++){
+        aecp[i]=*(a[i]->p);
+        BIG_384_58_copy(bbig[i],b[i]->z);
+    }
+    ECP_BLS12381_muln(r->p,n,aecp,bbig);
+    free(aecp);
+    free(bbig);
+    return r;   
 }
 
 int g1IsIdentity(const G1* a){

@@ -26,7 +26,7 @@ void keyGen(secretKey ** sk, publicKey ** pk){
     secretKey * newsk;
     publicKey * newpk;
     //Generate random Zp elements for the secret key sk.
-    *sk= malloc(sizeof(secretKey)+sizeof(Zp*[nattr]));
+    *sk= malloc(sizeof(secretKey)+nattr*sizeof(Zp*));
     newsk=*sk;
     newsk->x=zpRandom(rng);
     newsk->y_m=zpRandom(rng);
@@ -35,7 +35,7 @@ void keyGen(secretKey ** sk, publicKey ** pk){
     for(int i=0;i<nattr;i++)
         newsk->y[i]=zpRandom(rng);
     //Generate the corresponding verification key through exponentiation of generator by the sk members.
-    *pk= malloc(sizeof(publicKey)+sizeof(G1*[nattr]));
+    *pk= malloc(sizeof(publicKey)+nattr*sizeof(G1*));
     newpk=*pk;
     newpk->vx=g1Generator();
     g1Mul(newpk->vx,newsk->x);
@@ -55,52 +55,38 @@ publicKey* keyAggr(const publicKey *pks[], int nkeys){
     //Error handling:Check sizes match for keys
     //Error handling: Check nkeys value
     uint8_t n=pks[0]->n;
-    Zp *t[nkeys];
-    publicKey * avk=malloc(sizeof(publicKey)+sizeof(G1*[n]));
-    G1 *aux;
+    Zp **t=malloc(nkeys*sizeof(Zp*));
+    publicKey * avk=malloc(sizeof(publicKey)+n*sizeof(G1*));
+    G1 **auxArrayG1=malloc(nkeys*sizeof(G1*)); //Will just hold pointers so we can use the Muln method properly
     //Generate t<-H1(Verification keys)
     hash1(pks,nkeys,t);
     avk->n=n;
     // Multiplication+exponentiation of member X of the verification keys (Getting X member of Avk).
-    avk->vx=g1Copy(pks[0]->vx);
-    g1Mul(avk->vx,t[0]);
-    for(int i=1;i<nkeys;i++){
-        if(i==1)
-            aux=g1Copy(pks[i]->vx);
-        else
-            g1CopyValue(aux,pks[i]->vx);  
-        g1Mul(aux,t[i]);
-        g1Add(avk->vx,aux);
+    for(int i=0;i<nkeys;i++){
+        auxArrayG1[i]=pks[i]->vx;
     }
+    avk->vx=g1Muln(auxArrayG1,t,nkeys);
     // Multiplication+exponentiation of member Y_epoch of the verification keys (Getting Y_epoch member of Avk).
-    avk->vy_epoch=g1Copy(pks[0]->vy_epoch);
-    g1Mul(avk->vy_epoch,t[0]);
-    for(int i=1;i<nkeys;i++){
-        g1CopyValue(aux,pks[i]->vy_epoch);
-        g1Mul(aux,t[i]);
-        g1Add(avk->vy_epoch,aux);
-    } 
+    for(int i=0;i<nkeys;i++){
+        auxArrayG1[i]=pks[i]->vy_epoch;
+    }
+    avk->vy_epoch=g1Muln(auxArrayG1,t,nkeys);
     // Multiplication+exponentiation of member Y_m' of the verification keys (Getting Y_m' member of Avk).
-    avk->vy_m=g1Copy(pks[0]->vy_m);
-    g1Mul(avk->vy_m,t[0]);
-    for(int i=1;i<nkeys;i++){
-        g1CopyValue(aux,pks[i]->vy_m); 
-        g1Mul(aux,t[i]);
-        g1Add(avk->vy_m,aux);
-    } 
+    for(int i=0;i<nkeys;i++){
+        auxArrayG1[i]=pks[i]->vy_m;
+    }
+    avk->vy_m=g1Muln(auxArrayG1,t,nkeys);
     // Multiplication+exponentiation of members Y_i of the verification keys (Getting Y_i members of Avk).
     for(int j=0;j<n;j++){
-        avk->vy[j]=g1Copy(pks[0]->vy[j]);
-        g1Mul(avk->vy[j],t[0]);
-        for(int i=1;i<nkeys;i++){
-            g1CopyValue(aux,pks[i]->vy[j]);
-            g1Mul(aux,t[i]);
-            g1Add(avk->vy[j],aux);
+        for(int i=0;i<nkeys;i++){
+            auxArrayG1[i]=pks[i]->vy[j];
         }
+        avk->vy[j]=g1Muln(auxArrayG1,t,nkeys);
     }
     for(int i=0;i<nkeys;i++)
         zpFree(t[i]);
-    g1Free(aux);
+    free(t);
+    free(auxArrayG1);
     return avk;
 }
 
@@ -137,7 +123,7 @@ signature* combine(const publicKey *pks[], const signature *signs[], int nkeys){
     //Error handling: Number of signatures/keys is the same
     //Error handling: Check same mprime/sigma1?
     signature *result=malloc(sizeof(signature));
-    Zp *t[nkeys];
+    Zp **t=malloc(nkeys*sizeof(Zp*));
     G2 *aux;
     //Get t<-H1(Verification keys)
     hash1(pks,nkeys,t);
@@ -156,6 +142,7 @@ signature* combine(const publicKey *pks[], const signature *signs[], int nkeys){
     }
     for(int i=0;i<nkeys;i++)
         zpFree(t[i]);
+    free(t);
     g2Free(aux);
     return result;
 }
@@ -164,6 +151,7 @@ signature* combine(const publicKey *pks[], const signature *signs[], int nkeys){
 int verify(const publicKey *pk, const signature* sign, const Zp *epoch, const Zp *attributes[]){
     //Error handling: Check number of attributes
     G1 *el2, *aux, *generator;
+    G1 **auxArray=malloc(pk->n*sizeof(G1*));
     G3 *lh, *rh;
     int result;
     //Check sigma1!=1G
@@ -178,10 +166,11 @@ int verify(const publicKey *pk, const signature* sign, const Zp *epoch, const Zp
     g1Mul(aux,epoch);
     g1Add(el2,aux);
     for(int i=0;i<pk->n;i++){
-        g1CopyValue(aux,pk->vy[i]);
-        g1Mul(aux,attributes[i]);
-        g1Add(el2,aux);
+        auxArray[i]=pk->vy[i];
     }
+    g1Free(aux);
+    aux=g1Muln(auxArray,attributes,pk->n);
+    g1Add(el2,aux);
     //Check pairing condition e(sigma1, X * (Y_m')^m'* Prod (Y_i)^m_i )=e(sigma2,Group1generator)
     generator=g1Generator();
     lh=pair(el2, sign->sigma1);
@@ -192,6 +181,7 @@ int verify(const publicKey *pk, const signature* sign, const Zp *epoch, const Zp
     g1Free(generator);
     g3Free(lh);
     g3Free(rh);
+    free(auxArray);
     return result;
 }
 
@@ -218,11 +208,12 @@ zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *e
     int nhidden=pk->n-nIndexReveal;
     G2 *auxG2;
     G1 *auxG1, *aux2G1;
+    G1** auxArray=malloc(nhidden*sizeof(G1*));
     G3 *pairRes;
-    zkToken  *token=malloc(sizeof(zkToken)+sizeof(Zp*[nhidden]));
+    zkToken  *token=malloc(sizeof(zkToken)+nhidden*sizeof(Zp*));
     token->n=nhidden;
     //Hidden attributes
-    int hidden[nhidden];
+    int *hidden=malloc(nhidden*sizeof(int));
     computeHidden(hidden,indexReveal,nIndexReveal,pk->n,nhidden);
     //Generate random Zp elements and sigma1', sigma2'
     r=zpRandom(rng);
@@ -246,10 +237,10 @@ zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *e
     g1Mul(aux2G1,token->v_mprime);
     g1Add(auxG1,aux2G1);
     for(int j=0;j<nhidden;j++){
-        g1CopyValue(aux2G1,pk->vy[hidden[j]]);
-        g1Mul(aux2G1,token->v_mj[j]);
-        g1Add(auxG1,aux2G1);
+        auxArray[j]=pk->vy[hidden[j]];
     }
+    aux2G1=g1Muln(auxArray,token->v_mj,nhidden);
+    g1Add(auxG1,aux2G1);
     pairRes=pair(auxG1,token->sigma1);
     hash2(message,messageSize,pk,token->sigma1,token->sigma2,pairRes, &token->c); 
     //Calculate v_i= ran_i - c * i
@@ -260,7 +251,7 @@ zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *e
     zpMul(auxZp,sign->mprime);
     zpSub(token->v_mprime,auxZp);
     for(int j=0;j<nhidden;j++){
-        zpCopyValue(auxZp,token->c);
+        zpCopyValue(auxZp,token->c); 
         zpMul(auxZp,attributes[hidden[j]]);
         zpSub(token->v_mj[j],auxZp);
     }
@@ -271,6 +262,8 @@ zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *e
     g1Free(aux2G1);
     g2Free(auxG2); 
     g3Free(pairRes);
+    free(hidden);
+    free(auxArray);
     return token;
 }
 
@@ -282,6 +275,7 @@ int verifyZkToken(const zkToken *token, const publicKey * pk, const Zp *epoch, c
     G1 *auxEl, *auxG1;
     G2 *auxG2;
     Zp *auxZp, *aux2Zp;
+    G1** auxArray=malloc(token->n*sizeof(G1*));
     //G1 *el1Pair[2];
     //G2 *el2Pair[2];
     G3 *pairRes;
@@ -289,7 +283,7 @@ int verifyZkToken(const zkToken *token, const publicKey * pk, const Zp *epoch, c
     if(g2IsIdentity(token->sigma1) || g2IsIdentity(token->sigma2))
         return 0;
     //Compute hidden
-    int hidden[token->n];
+    int *hidden=malloc(token->n*sizeof(int));
     computeHidden(hidden,indexReveal,nReveal,pk->n,token->n);
     //Compute the necessary pairings/operations
     auxEl=g1Generator();
@@ -306,12 +300,12 @@ int verifyZkToken(const zkToken *token, const publicKey * pk, const Zp *epoch, c
     g1InvMul(auxG1,auxZp);
     g1Add(auxEl,auxG1);
     for (int j=0;j<token->n;j++){
-        g1CopyValue(auxG1,pk->vy[hidden[j]]);
-        g1Mul(auxG1,token->v_mj[j]);
-        g1Add(auxEl,auxG1);
+        auxArray[j]=pk->vy[hidden[j]];
     }
+    auxG1=g1Muln(auxArray,token->v_mj,token->n);
+    g1Add(auxEl,auxG1);
     for (int j=0;j<nReveal;j++){
-        g1CopyValue(auxG1,pk->vy[indexReveal[j]]);
+        g1CopyValue(auxG1,pk->vy[indexReveal[j]]);      //TODO join into one n-multiplication
         zpCopyValue(auxZp,token->c);
         zpMul(auxZp,revealed[j]);
         g1InvMul(auxG1,auxZp);
@@ -337,6 +331,8 @@ int verifyZkToken(const zkToken *token, const publicKey * pk, const Zp *epoch, c
     g1Free(auxEl);
     g2Free(auxG2);
     g3Free(pairRes);
+    free(hidden);
+    free(auxArray);
     return result;
 }
 

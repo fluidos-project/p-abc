@@ -95,6 +95,15 @@ void g1Mul(G1* a, const Zp* b);
 void g1InvMul(G1* a, const Zp* b);
 
 /**
+ * @brief Multi-multiplication (n-multiplication), res=Sigma [b_i]a_i
+ * 
+ * @param a Array of bases (G1 elements)
+ * @param b Array of multipliers (Zp elements)
+ * @param n Length of arrays (assumed to be same and valid)
+ */
+G1* g1Muln(const G1* a[], const Zp* b[],int n);
+
+/**
  * @brief Check if element is identity
  * 
  * @param a EC point

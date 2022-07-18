@@ -36,7 +36,7 @@ publicKey * dpabcPkFromBytes(const char *bytes){
     int g1Bytes=g1ByteSize();
     char * aux=bytes;
     uint8_t n=bytes[0];
-    publicKey *res= malloc(sizeof(publicKey)+sizeof(G1*[n]));
+    publicKey *res= malloc(sizeof(publicKey)+n*sizeof(G1*));
     res->n=n;
     aux=aux+1;
     res->vx=g1FromBytes(aux);
@@ -101,7 +101,7 @@ secretKey * dpabcSkFromBytes(const char *bytes){
     int zpBytes=zpByteSize();
     char * aux=bytes;
     uint8_t n=bytes[0];
-    secretKey *res= malloc(sizeof(secretKey)+sizeof(Zp*[n]));
+    secretKey *res= malloc(sizeof(secretKey)+n*sizeof(Zp*));
     res->n=n;
     aux=aux+1;
     res->x=zpFromBytes(aux);

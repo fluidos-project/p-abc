@@ -159,7 +159,7 @@ static void test_fraudulent_modifications_flow(void **state)
 
 static void test_flow_with_serialization(void **state)
 {
-	int nattr=3;
+	int nattr=15;
 	int nkeys=2;
     char * seed="SeedForTheTest_test_flow_with_serialization";
 	char * msg="signedMessage_serial";

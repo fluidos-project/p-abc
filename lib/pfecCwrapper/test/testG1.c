@@ -107,6 +107,44 @@ static void test_multiplication(void **state)
     zpFree(z2);
 }
 
+static void test_muln(void **state){
+    char * seed="Seed_test_muln_0123456789";
+    int seedLength=25;
+    ranGen * rng=rgInit(seed,seedLength);
+    int n=20;
+    G1 *res1, *res2;
+    G1 *auxG1=g1Generator();
+    Zp *auxZp=zpFromInt(0);
+    G1 **bases=malloc(n*sizeof(G1*));
+    Zp **scalars=malloc(n*sizeof(Zp*));
+    for(int i=0;i<n;i++){
+        scalars[i]=zpRandom(rng);
+        bases[i]=g1Generator();
+        zpRandomValue(rng,auxZp);
+        g1Mul(bases[i],auxZp);
+    }
+    res1=g1Copy(bases[0]);
+    g1Mul(res1,scalars[0]);
+    for(int i=1;i<n;i++){
+        g1CopyValue(auxG1,bases[i]); 
+        g1Mul(auxG1,scalars[i]);
+        g1Add(res1,auxG1);
+    } 
+    res2=g1Muln(bases,scalars,n);
+    assert_true(g1Equals(res1,res2));
+    g1Free(res1);
+    g1Free(res2);
+    g1Free(auxG1);
+    zpFree(auxZp);
+    for(int i=0;i<n;i++){
+        g1Free(bases[i]);
+        zpFree(scalars[i]);
+    }
+    free(bases);
+    free(scalars);
+    rgFree(rng);
+}
+
 static void test_serial(void **state){
     char * seed="Seed_test_serial_0123456789";
     int seedLength=27;
@@ -136,6 +174,7 @@ int main()
         cmocka_unit_test(test_copies),
         cmocka_unit_test(test_addition),
         cmocka_unit_test(test_multiplication),
+        cmocka_unit_test(test_muln),
         cmocka_unit_test(test_serial)
     };
     //cmocka_set_message_output(CM_OUTPUT_XML);
