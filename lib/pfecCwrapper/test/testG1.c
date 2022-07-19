@@ -153,7 +153,7 @@ static void test_serial(void **state){
     G1* g1=g1Generator();
     G1* g2;
     int nbytes=g1ByteSize();
-    char bytes1[nbytes];
+    char *bytes1=malloc(nbytes*sizeof(char));
     g1ToBytes(bytes1,g1);
     g2=g1FromBytes(bytes1);
     assert_true(g1Equals(g1,g2));
@@ -165,6 +165,7 @@ static void test_serial(void **state){
     g1Free(g1);
     g1Free(g2);
     rgFree(rng);
+    free(bytes1);
 }
 
 int main()

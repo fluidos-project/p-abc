@@ -12,17 +12,17 @@ int main() {
 	char * msg="signedMessage";
 	int msgLength=13;
 	int seedLength=40;
-	Zp *attributes[nattr];
+	Zp **attributes=malloc(nattr*sizeof(Zp*));
 	ranGen * rng=rgInit(seed,seedLength);
-	publicKey *pks[nkeys];
+	publicKey **pks=malloc(nkeys*sizeof(publicKey*));
 	publicKey *aggrKey;
-	secretKey *sks[nkeys];
-	signature *partialSigns[nkeys];
+	secretKey **sks=malloc(nkeys*sizeof(secretKey*));
+	signature **partialSigns=malloc(nkeys*sizeof(signature*));
 	signature *combinedSignature;
 	zkToken* token;
 	int nIndexReveal=2;
     int indexReveal[]={0,2};
-	Zp *revealedAttributes[nIndexReveal];
+	Zp **revealedAttributes=malloc(nIndexReveal*sizeof(Zp*));
 	Zp *epoch=zpFromInt(12034);
 	printf("Starting nattr %d, nreveal %d, nkeys %d\n",nattr,nIndexReveal,nkeys);
     changeNattr(nattr);
@@ -84,6 +84,11 @@ int main() {
 	dpabcZkFree(token);
     zpFree(epoch);
 	rgFree(rng);
+	free(pks);
+	free(attributes);
+	free(sks);
+	free(revealedAttributes);
+	free(partialSigns);
 	dpabcFreeStateData();
     return 0;
 }

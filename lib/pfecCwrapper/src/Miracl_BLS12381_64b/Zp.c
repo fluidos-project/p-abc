@@ -29,11 +29,12 @@ Zp *hashToZp(const char * bytes,int nBytes){
     hash384 h;
     HASH384_init(&h);
     int hashSize=h.hlen;
-    char hashed[hashSize];
+    char hashed=malloc(hashSize*sizeof(char));
     for(int i=0;i<nBytes;i++)
         HASH384_process(&h,bytes[i]);
     HASH384_hash(&h,hashed);
     BIG_384_58_fromBytesLen(r->z,hashed,hashSize);
+    free(hashed);
     return r;
 }
 

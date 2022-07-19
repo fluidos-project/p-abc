@@ -24,8 +24,6 @@
 //TODO Rethink const for methods. Issue: with underlying libraries not declaring const even if they are, causes warnings
 // Issue with double pointers: forcing user to cast to const
 
-//TODO Remove variable length arrays
-
 /**
  * @brief Change the number of attributes considered for the operations of the scheme
  * 

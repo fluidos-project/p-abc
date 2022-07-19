@@ -121,7 +121,7 @@ static void test_serial(void **state){
     Zp* z1=zpRandom(rng);
     Zp* z2;
     int nbytes=zpByteSize();
-    char bytes1[nbytes];
+    char *bytes1=malloc(nbytes*sizeof(char));
     zpToBytes(bytes1,z1);
     z2=zpFromBytes(bytes1);
     assert_true(zpEquals(z1,z2));
@@ -132,6 +132,7 @@ static void test_serial(void **state){
     zpFree(z1);
     zpFree(z2);
     rgFree(rng);
+    free(bytes1);
 }
 
 int main()
