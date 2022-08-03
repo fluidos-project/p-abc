@@ -2,6 +2,23 @@
 #include "types_impl.h"
 #include <stdlib.h>
 
+
+publicKey *dpabcSkToPk(const secretKey *sk){
+    publicKey* res= malloc(sizeof(publicKey)+sk->n*sizeof(G1*));
+    res->vx=g1Generator();
+    g1Mul(res->vx,sk->x);
+    res->vy_m=g1Generator();
+    g1Mul(res->vy_m,sk->y_m);
+    res->vy_epoch=g1Generator();
+    g1Mul(res->vy_epoch,sk->y_epoch);
+    res->n=sk->n;
+    for(int i=0;i<res->n;i++){
+        res->vy[i]=g1Generator();
+        g1Mul(res->vy[i],sk->y[i]);
+    }  
+    return res;  
+}
+
 void dpabcPkFree(publicKey *pk){
     g1Free(pk->vx);
     g1Free(pk->vy_epoch);

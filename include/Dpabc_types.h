@@ -41,6 +41,11 @@ typedef struct signatureImpl signature;
 typedef struct zkTokenImpl zkToken;
 
 /**
+ * @brief Get public key corresponding to secret key sk 
+ */ 
+publicKey *dpabcSkToPk(const secretKey *sk);
+
+/**
  * @brief Free memory from publicKey (and all its elements)
  * @param pk 
  */

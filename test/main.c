@@ -37,7 +37,7 @@ static void test_hidden_indexes_computation(void **state)
 
 static void test_simple_complete_flow(void **state)
 {
-	int nattr=15;
+	int nattr=3;
 	int nkeys=2;
     char * seed="SeedForTheTest_test_simple_complete_flow";
 	char * msg="signedMessage_flow";
@@ -191,7 +191,6 @@ static void test_flow_with_serialization(void **state)
     int indexReveal[]={0,2};
 	Zp **revealedAttributes=malloc(nIndexReveal*sizeof(Zp*));
 	Zp *epoch=zpFromInt(12034);
-
 	changeNattr(nattr);
 	seedRng(seed,seedLength);
 	for(int i=0;i<nattr;i++)
@@ -244,6 +243,25 @@ static void test_flow_with_serialization(void **state)
 	dpabcFreeStateData();
 }
 
+static void test_public_key(void **state)
+{
+	int nattr=15;
+    char * seed="SeedForTheTest_test_public_key";
+	int msgLength=18;
+	int seedLength=31;
+	secretKey *sk;
+	publicKey *pk, *pk2;
+	changeNattr(nattr);
+	seedRng(seed,seedLength);
+	keyGen(&sk,&pk);
+	pk2=dpabcSkToPk(sk);
+	assert_true(dpabcPkEquals(pk,pk2));
+	dpabcSkFree(sk);
+	dpabcPkFree(pk);
+	dpabcPkFree(pk2);
+	dpabcFreeStateData();
+}
+
 int main()
 {
     const struct CMUnitTest dpabctests[] =
@@ -251,7 +269,8 @@ int main()
         cmocka_unit_test(test_hidden_indexes_computation),
 		cmocka_unit_test(test_simple_complete_flow),
 		cmocka_unit_test(test_fraudulent_modifications_flow),
-		cmocka_unit_test(test_flow_with_serialization)
+		cmocka_unit_test(test_flow_with_serialization),
+		cmocka_unit_test(test_public_key)
     };
 	//cmocka_set_message_output(CM_OUTPUT_XML);
 	// Define environment variable CMOCKA_XML_FILE=testresults/libc.xml 
