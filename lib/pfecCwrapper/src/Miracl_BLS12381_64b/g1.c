@@ -123,6 +123,8 @@ void g1InvMul(G1* a, const Zp* b){
 }
 
 G1* g1Muln(const G1* a[], const Zp* b[], int n){
+    if(n==0)
+        return g1Identity();
     G1 *r=malloc(sizeof(G1));
     r->p=malloc(sizeof(ECP_BLS12381));
     if(n<MULNBREAKPOINT){
