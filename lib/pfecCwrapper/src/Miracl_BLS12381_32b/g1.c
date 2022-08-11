@@ -142,7 +142,7 @@ G1* g1Muln(const G1* a[], const Zp* b[], int n){
     BIG_384_29* bbig=malloc(n*sizeof(BIG_384_29));
     for(int i=0;i<n;i++){
         aecp[i]=*(a[i]->p);
-        BIG_384_58_copy(bbig[i],b[i]->z);
+        BIG_384_29_copy(bbig[i],b[i]->z);
     }
     ECP_BLS12381_muln(r->p,n,aecp,bbig);
     free(aecp);
