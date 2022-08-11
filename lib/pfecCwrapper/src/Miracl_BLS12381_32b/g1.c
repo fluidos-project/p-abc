@@ -123,6 +123,8 @@ void g1InvMul(G1* a, const Zp* b){
 }
 
 G1* g1Muln(const G1* a[], const Zp* b[], int n){
+    if(n==0)
+        return g1Identity();
     G1 *r=malloc(sizeof(G1));
     r->p=malloc(sizeof(ECP_BLS12381));
     if(n<MULNBREAKPOINT){
@@ -136,13 +138,15 @@ G1* g1Muln(const G1* a[], const Zp* b[], int n){
         }
         return r;
     }
-    ECP_BLS12381 aecp[n];
-    BIG_384_29 bbig[n];
+    ECP_BLS12381* aecp=malloc(n*sizeof(ECP_BLS12381));
+    BIG_384_29* bbig=malloc(n*sizeof(BIG_384_29));
     for(int i=0;i<n;i++){
-        aecp[n]=*(a[i]->p);
-        BIG_384_29_copy(bbig[i],b[i]->z);
+        aecp[i]=*(a[i]->p);
+        BIG_384_58_copy(bbig[i],b[i]->z);
     }
     ECP_BLS12381_muln(r->p,n,aecp,bbig);
+    free(aecp);
+    free(bbig);
     return r;   
 }
 
