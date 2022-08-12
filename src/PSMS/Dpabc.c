@@ -245,9 +245,9 @@ zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *e
         for(int j=0;j<nhidden;j++){
             auxArray[j]=pk->vy[hidden[j]];
         }
+        g1Free(aux2G1);
         aux2G1=g1Muln(auxArray,token->v_mj,nhidden);
         g1Add(auxG1,aux2G1);
-        g1Free(aux2G1);
     }
     pairRes=pair(auxG1,token->sigma1);
     hash2(message,messageSize,pk,token->sigma1,token->sigma2,pairRes, &token->c); 
@@ -268,6 +268,7 @@ zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *e
     zpFree(auxZp);
     g1Free(auxG1);
     g2Free(auxG2); 
+    g1Free(aux2G1);
     g3Free(pairRes);
     if(nhidden>0){
         free(hidden);

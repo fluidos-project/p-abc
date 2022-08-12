@@ -136,6 +136,7 @@ G1* g1Muln(const G1* a[], const Zp* b[], int n){
             ECP_BLS12381_mul(aux,b[i]->z); 
             ECP_BLS12381_add(r->p,aux);
         }
+        free(aux);
         return r;
     }
     ECP_BLS12381* aecp=malloc(n*sizeof(ECP_BLS12381));
