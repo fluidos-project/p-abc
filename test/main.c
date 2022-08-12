@@ -72,6 +72,7 @@ static void test_simple_complete_flow(void **state)
 	assert_true(verifyZkToken(token,aggrKey,epoch,(const Zp **)revealedAttributes,indexReveal,nIndexReveal,msg,msgLength));
 	for(int i=0;i<nattr;i++)
 		zpFree(attributes[i]);
+	zpFree(epoch);
 	for(int i=0;i<nkeys;i++){
 		dpabcPkFree(pks[i]);
 		dpabcSkFree(sks[i]);
@@ -142,8 +143,12 @@ static void test_fraudulent_modifications_flow(void **state)
 	assert_false(verifyZkToken(token,aggrKey,epoch,(const Zp **)modifiedRevealedAttributes,indexReveal,nIndexReveal,msg,msgLength));
 	assert_false(verifyZkToken(token,aggrKey,epoch,(const Zp **)fewerRevealedAttributes,indexReveal,nIndexReveal-1,msg,msgLength));
 	assert_false(verifyZkToken(token,aggrKey,modifiedEpoch,(const Zp **)revealedAttributes,indexReveal,nIndexReveal,msg,msgLength));
-	for(int i=0;i<nattr;i++)
+	for(int i=0;i<nattr;i++){
 		zpFree(attributes[i]);
+		zpFree(modifiedAttr[i]);
+	}
+	zpFree(epoch);
+	zpFree(modifiedEpoch);
 	for(int i=0;i<nkeys;i++){
 		dpabcPkFree(pks[i]);
 		dpabcSkFree(sks[i]);
@@ -161,6 +166,8 @@ static void test_fraudulent_modifications_flow(void **state)
 	free(pks);
 	free(attributes);
 	free(sks);
+	free(pks);
+	free(partialSigns);
 	free(revealedAttributes);
 	free(modifiedAttr);
 	free(modifiedRevealedAttributes);
@@ -218,6 +225,7 @@ static void test_flow_with_serialization(void **state)
 	assert_true(verifyZkToken(tokenRegenerated,aggrKeyRegenerated,epoch,(const Zp **)revealedAttributes,indexReveal,nIndexReveal,msg,msgLength));
 	for(int i=0;i<nattr;i++)
 		zpFree(attributes[i]);
+	zpFree(epoch);
 	for(int i=0;i<nkeys;i++){
 		dpabcPkFree(pks[i]);
 		dpabcSkFree(sks[i]);

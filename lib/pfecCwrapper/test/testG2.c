@@ -104,6 +104,7 @@ static void test_multiplication(void **state)
     g2Free(g);
     zpFree(z1);
     zpFree(z2);
+    rgFree(rng);
 }
 
 static void test_serial(void **state){
@@ -125,8 +126,8 @@ static void test_serial(void **state){
     zpFree(z);
     g2Free(g1);
     g2Free(g2);
-    rgFree(rng);
     free(bytes1);
+    rgFree(rng);
 }
 
 int main()
