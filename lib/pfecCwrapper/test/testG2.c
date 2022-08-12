@@ -66,6 +66,7 @@ static void test_addition(void **state) //TODO Test using precomputed elements.
     g2Free(g2);
     g2Free(g3);
     g2Free(g4);
+    g2Free(identity);
     zpFree(z1);
     zpFree(z2);
     rgFree(rng);
@@ -102,6 +103,7 @@ static void test_multiplication(void **state)
     g2Free(g1);
     g2Free(g2);
     g2Free(g);
+    zpFree(one);
     zpFree(z1);
     zpFree(z2);
     rgFree(rng);

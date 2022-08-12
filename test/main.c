@@ -166,7 +166,6 @@ static void test_fraudulent_modifications_flow(void **state)
 	free(pks);
 	free(attributes);
 	free(sks);
-	free(pks);
 	free(partialSigns);
 	free(revealedAttributes);
 	free(modifiedAttr);

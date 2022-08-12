@@ -103,6 +103,7 @@ static void test_multiplication(void **state)
     g1Free(g1);
     g1Free(g2);
     g1Free(g);
+    zpFree(one);
     zpFree(z1);
     zpFree(z2);
     rgFree(rng);
