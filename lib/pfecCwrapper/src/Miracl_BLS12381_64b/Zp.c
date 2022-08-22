@@ -85,6 +85,26 @@ void zpNeg(Zp* a){
     BIG_384_58_modneg(a->z,a->z,P);
 }
 
+int zpNbits(Zp* a){
+    return BIG_384_58_nbits(a);
+}
+
+int zpParity(Zp* a){
+    return BIG_384_58_parity(a);
+}
+
+
+void zpDouble(Zp* a){
+    BIG_384_58_norm(a);
+    BIG_384_58_fshl(a,1);
+}
+
+
+int zpHalf(Zp* a){
+    BIG_384_58_norm(a);
+    return BIG_384_58_fshr(a,1);
+}
+
 int zpEquals(const Zp* a, const Zp* b){
     BIG_384_58_mod(a->z,P);
     BIG_384_58_mod(b->z,P);

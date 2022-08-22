@@ -87,6 +87,30 @@ void g1Sub(G1* a, const G1* b);
 void g1Mul(G1* a, const Zp* b);
 
 /**
+ * @brief Multiplication [b] lt[0], with lt being a lookup table for G1 element g with lt[i]=g^(2^(i+1)). Result must be freed.
+ * 
+ * @param lt being a lookup table for G1 element g with lt[i]=g^(2^(i+1))
+ * @param b Second operand
+ * @return The resut [b]·lt[1]
+ */
+G1* g1MulLookup(const G1* lt[], const Zp* b);
+
+/**
+ * @brief Multiplication res= [b] lt[0], with lt being a lookup table for G1 element g with lt[i]=g^(2^(i+1)). 
+ * 
+ * @param res Will contain the result of the computation, should have been allocated before
+ * @param lt A lookup table for G1 element g with lt[i]=g^(2^(i+1))
+ * @param b Second operand
+ */
+void g1MulLookupWithoutAllocation(G1* res, const G1* lt[], const Zp* b);
+
+/**
+ * @brief Compute lookup table of size n for element g. Result must be freed.
+ * @return The lookup table, res[i]=g^(2^(i+1))
+ */
+G1** g1CompLookupTable(const G1* g, int n);
+
+/**
  * @brief Inverse multiplication [-b]a
  * 
  * @param a EC point, will be modified to the resulting value

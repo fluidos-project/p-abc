@@ -106,6 +106,28 @@ void zpMul(Zp* a, const Zp* b);
 void zpNeg(Zp* a);
 
 /**
+ * @brief Return the number of bits (ignoring left-zeros, i.e. position of most significant bit counting from the least significant bit as 1) of a
+ * 
+ * For instance: For a=7 return 3, for a=8 return 4.
+ */
+int zpNbits(Zp* a);
+
+/**
+ * @brief Return the parity (0 even, 1 odd) of a
+ */
+int zpParity(Zp* a);
+
+/**
+ * @brief Double a (usually through bit-shift)
+ */
+void zpDouble(Zp* a);
+
+/**
+ * @brief Halve a, return reminder (usually through bit-shift)
+ */
+int zpHalf(Zp* a);
+
+/**
  * @brief Checks a=b in Zp
  * 
  * @param a First element

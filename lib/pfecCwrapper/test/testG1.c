@@ -170,6 +170,29 @@ static void test_serial(void **state){
     rgFree(rng);
 }
 
+static void test_mul_lookup(void **state)
+{
+    char * seed="Seed_test_mul_lookup_0123456789";
+    int seedLength=31;
+    ranGen * rng=rgInit(seed,seedLength);
+    Zp* z1=zpRandom(rng);
+    G1* g=g1Generator(); 
+    G1* g2=g1Generator();
+    g1Add(g2,g2);
+    G1* res1;
+    int n=256;
+    G1** lt=g1CompLookupTable(g,n);
+    res1=g1MulLookup(lt,z1);
+    g1Mul(g,z1);
+    assert_true(g1Equals(g,res1));
+    g1Free(g);
+    zpFree(z1);
+    g1Free(res1);
+    for(int i=0;i<n;i++)
+        g1Free(lt[i]);
+    free(lt);
+}
+
 int main()
 {
     const struct CMUnitTest g1tests[] =
@@ -178,7 +201,8 @@ int main()
         cmocka_unit_test(test_addition),
         cmocka_unit_test(test_multiplication),
         cmocka_unit_test(test_muln),
-        cmocka_unit_test(test_serial)
+        cmocka_unit_test(test_serial),
+        cmocka_unit_test(test_mul_lookup)
     };
     //cmocka_set_message_output(CM_OUTPUT_XML);
 	// Define environment variable CMOCKA_XML_FILE=testresults/libc.xml 

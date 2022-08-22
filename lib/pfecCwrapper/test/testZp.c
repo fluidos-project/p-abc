@@ -135,6 +135,27 @@ static void test_serial(void **state){
     free(bytes1);
 }
 
+static void test_bitops(void **state)
+{
+    Zp* z1=zpFromInt(27);
+    Zp* z2=zpFromInt(54);
+    Zp* z3=zpCopy(z1);
+    Zp* zRes=zpFromInt(13);
+    assert_int_equal(zpParity(z1),1);
+    assert_int_equal(zpParity(z2),0);
+    assert_int_equal(zpParity(zRes),1);
+    assert_true(zpNbits(z1)==5);
+    zpDouble(z1);
+    assert_true(zpEquals(z1,z2));
+    int reminder=zpHalf(z3);
+    assert_int_equal(reminder,1);
+    assert_true(zpEquals(z3,zRes));
+    zpFree(z1);
+    zpFree(z2);
+    zpFree(z3);
+    zpFree(zRes);
+}
+
 int main()
 {
     const struct CMUnitTest zptests[] =
@@ -143,7 +164,8 @@ int main()
         cmocka_unit_test(test_addition),
         cmocka_unit_test(test_neg_sub),
         cmocka_unit_test(test_multiplication),
-        cmocka_unit_test(test_serial)
+        cmocka_unit_test(test_serial),
+        cmocka_unit_test(test_bitops)
     };
     //cmocka_set_message_output(CM_OUTPUT_XML);
 	// Define environment variable CMOCKA_XML_FILE=testresults/libc.xml 

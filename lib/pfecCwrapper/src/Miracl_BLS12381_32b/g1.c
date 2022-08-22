@@ -115,6 +115,33 @@ void g1Mul(G1* a, const Zp* b){
     ECP_BLS12381_mul(a->p,b->z); 
 }
 
+G1* g1MulLookup(const G1* lt[], const Zp* b){
+    G1 *res=g1Identity();
+    g1MulLookupWithoutAllocation(res,lt,b);
+    return res;
+}
+
+void g1MulLookupWithoutAllocation(G1* res, const G1* lt[], const Zp* b){
+    ECP_BLS12381_inf(res->p);
+    Zp * aux=zpCopy(b);
+    for(int i=0;i<zpNbits(b);i++){
+        if(zpHalf(aux)){
+            g1Add(res,lt[i]);
+        }  
+    }
+    zpFree(aux);
+}
+
+G1** g1CompLookupTable(const G1* g, int n){
+    G1** lt=malloc(n*sizeof(G1*));
+    lt[0]=g1Copy(g);
+    for(int i=1;i<n;i++){
+        lt[i]=g1Copy(lt[i-1]);
+        g1Add(lt[i],lt[i-1]);
+    }
+    return lt;
+}
+
 void g1InvMul(G1* a, const Zp* b){
     Zp aux;
     BIG_384_29_rcopy(aux.z,b->z);

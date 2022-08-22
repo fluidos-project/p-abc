@@ -29,11 +29,12 @@ Zp *hashToZp(const char * bytes,int nBytes){
     hash384 h;
     HASH384_init(&h);
     int hashSize=h.hlen;
-    char hashed[hashSize];
+    char *hashed=malloc(hashSize*sizeof(char));
     for(int i=0;i<nBytes;i++)
         HASH384_process(&h,bytes[i]);
     HASH384_hash(&h,hashed);
     BIG_384_29_fromBytesLen(r->z,hashed,hashSize);
+    free(hashed);
     return r;
 }
 
@@ -82,6 +83,27 @@ void zpMul (Zp *a, const Zp *b){
 
 void zpNeg(Zp* a){
     BIG_384_29_modneg(a->z,a->z,P);
+}
+
+
+int zpNbits(Zp* a){
+    return BIG_384_29_nbits(a);
+}
+
+int zpParity(Zp* a){
+    return BIG_384_29_parity(a);
+}
+
+
+void zpDouble(Zp* a){
+    BIG_384_29_norm(a);
+    BIG_384_29_fshl(a,1);
+}
+
+
+int zpHalf(Zp* a){
+    BIG_384_29_norm(a);
+    return BIG_384_29_fshr(a,1);
 }
 
 int zpEquals(const Zp* a, const Zp* b){
