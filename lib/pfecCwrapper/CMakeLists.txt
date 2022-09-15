@@ -10,7 +10,7 @@ set(DCMAKE_SH="CMAKE_SH-NOTFOUND")
 
 #Fix for cmocka in Windows (need to adjust path to your installation)
 if(WIN32 AND NOT CMOCKA_PATH)
-    set(CMOCKA_PATH "C:/MinGW/bin/cmocka/bin/cmocka.dll")
+    set(CMOCKA_PATH "C:/msys64/mingw64/bin/cmocka.dll")
 endif(WIN32 AND NOT CMOCKA_PATH)
 
 # Set folder paths
@@ -31,19 +31,7 @@ SET(M_BLS381_32 "pfec_Miracl_Bls381_32")
 
 SET(M_BLS381_32_SRC_PATH "${SRC_PATH_WRAPPER}/Miracl_BLS12381_32b")
 
-add_library(${M_BLS381_32} STATIC 
-        "${M_BLS381_32_SRC_PATH}/types.h"
-        "${M_BLS381_32_SRC_PATH}/Zp.c"
-        "${M_BLS381_32_SRC_PATH}/g1.c"
-        "${M_BLS381_32_SRC_PATH}/g2.c"
-        "${M_BLS381_32_SRC_PATH}/g3.c"
-        "${M_BLS381_32_SRC_PATH}/pair.c"
-        "${M_BLS381_32_SRC_PATH}/utils.c")
 
-target_include_directories(${M_BLS381_32} PUBLIC ${HEADER_PATH_WRAPPER})
-
-target_link_libraries(${M_BLS381_32}
-        mcbls381_32b)
 
 # Miracle Core BLS381_64bits instantiation
 SET(M_BLS381_64 "pfec_Miracl_Bls381_64")
@@ -76,18 +64,7 @@ enable_testing()
 add_subdirectory("${TEST_PATH_WRAPPER}/cmocka")
 
 ## Tests for pfec_Miracl_Bls381_32
-add_cmocka_test(cmockaTestZp_BLS381_32 
-                SOURCES "${TEST_PATH_WRAPPER}/testZp.c" 
-                LINK_LIBRARIES ${M_BLS381_32} cmocka)
-add_cmocka_test(cmockaTestG1_BLS381_32 
-                SOURCES "${TEST_PATH_WRAPPER}/testG1.c" 
-                LINK_LIBRARIES ${M_BLS381_32} cmocka) 
-add_cmocka_test(cmockaTestG2_BLS381_32  
-                SOURCES "${TEST_PATH_WRAPPER}/testG2.c" 
-                LINK_LIBRARIES ${M_BLS381_32} cmocka)                 
-add_cmocka_test(cmockaTestPair_BLS381_32  
-                SOURCES "${TEST_PATH_WRAPPER}/testPair.c" 
-                LINK_LIBRARIES ${M_BLS381_32} cmocka) 
+
 ## Tests for pfec_Miracl_Bls381_64
 add_cmocka_test(cmockaTestZp_BLS381_64 
                 SOURCES "${TEST_PATH_WRAPPER}/testZp.c" 
@@ -105,12 +82,7 @@ add_cmocka_test(cmockaTestPair_BLS381_64
 
 
 # Modifying output folders for libs/binaries
-set_target_properties(${M_BLS381_32} example_test
-PROPERTIES
-ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib/pfec_Miracl_Bls381_32"
-LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/lib/pfec_Miracl_Bls381_32"
-RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/output/bin/pfec_Miracl_Bls381_32"
-)
+
 
 set_target_properties(${M_BLS381_64} 
 PROPERTIES

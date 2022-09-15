@@ -10,7 +10,7 @@ set(DCMAKE_SH="CMAKE_SH-NOTFOUND")
 
 # Fix for cmocka in windows
 if(WIN32)
-    set(CMOCKA_PATH "C:/MinGW/bin/cmocka/bin/cmocka.dll")
+    set(CMOCKA_PATH "C:/msys64/mingw64/bin/cmocka.dll")
 endif(WIN32)
 
 # Set default value for wrapper library instantiation 
