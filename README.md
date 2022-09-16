@@ -74,10 +74,11 @@ The ''setupscript.sh'' script allows automatic setup of the project, and optiona
 - Checks whether Cmocka is installed, and performs the installation process otherwise using cmake/make install. **Note:** This process requires privileges (sudo).
 - Compiles the Miracl/core library and copies the result to the corresponding directory
 
-Additionally, the scripts accepts the following options:
+Additionally, the script accepts the following options:
 - "-b": Build the project (with cmake and make)
 - "-t": Test the project. Needs to be used along "-b" to work
 - "-d <export_directory>": Defines a directory for copying the bundled library libdpabc_psms_bundled.a. Needs to be used along "-b" to work
+- "-s": Skip setup.
 
 
 ## Documentation
