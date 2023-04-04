@@ -4,10 +4,11 @@
 #include <pair.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 static int nattr=NATTRINI; // Instead we could simply put an extra argument at keyGen (as keys are always used in other methods and have the number of attributes stored)
-static ranGen *rng;
+static ranGen *rng=NULL;
 //TODO Change comments to additive notation
 
 void changeNattr(int n){
@@ -20,8 +21,21 @@ void seedRng(const char* seed,int n){
     rng=rgInit(seed,n);
 }
 
+void createSeed(char * seed, char* length){ //TODO Crypto safe seed generation 
+    srand(time(NULL));
+    for (int i=0;i<length;i++){
+        seed[i]=rand();
+    }
+}
+
 
 void keyGen(secretKey ** sk, publicKey ** pk){
+    if(rng==NULL){
+        int seedLength=128;
+        char * newSeed=malloc(seedLength*sizeof(char));
+        createSeed(newSeed,seedLength);
+        seedRng(newSeed,seedLength);
+    }
     //Error handling: Check random generator ready
     secretKey * newsk;
     publicKey * newpk;
@@ -201,6 +215,12 @@ void computeHidden(int hidden[],const int *indexReveal,int nIndexReveal,int n,in
 
 zkToken* presentZkToken(const publicKey * pk, const signature *sign, const Zp *epoch, const Zp *attributes[], 
         const int indexReveal[], int nIndexReveal, const char *message, int messageSize){
+    if(rng==NULL){
+        int seedLength=128;
+        char * newSeed=malloc(seedLength*sizeof(char));
+        createSeed(newSeed,seedLength);
+        seedRng(newSeed,seedLength);
+    }
     //Error handling: Check random generator ready
     //Error handling: Check number of attributes
     //Error handling: Consistent and ordered revealed attributes
