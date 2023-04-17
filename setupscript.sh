@@ -10,6 +10,23 @@ dotest="false"
 skip_setup="false"
 scriptdir=$(pwd)
 
+# Detect system bits
+bits=$(getconf LONG_BIT)
+
+# Detect Python version
+if command -v python3 >/dev/null 2>&1; then
+  python_cmd="python3"
+else
+  python_cmd="python"
+fi
+
+# Set MIRACL configuration file name based on system bits
+if [ "$bits" = "32" ]; then
+  miracl_config="config32_mod.py"
+else
+  miracl_config="config64.py"
+fi
+
 while getopts "btd:" opt; do
   case "$opt" in
     b)  build="true"
@@ -52,7 +69,7 @@ else
     fi
 
     #(cd lib/pfecCwrapper/lib/miracl-core-c && python config32_mod.py -o 31 && cp core.a ../Miracl_BLS12381_32b/core_unix.a)
-    (cd lib/pfecCwrapper/lib/miracl-core-c && python config64.py -o 31 && cp core.a ../Miracl_BLS12381_64b/core_unix.a)
+    (cd lib/pfecCwrapper/lib/miracl-core-c && $python_cmd $miracl_config -o 31 && cp core.a ../Miracl_BLS12381_${bits}b/core_unix.a)
 fi
 
 if [ "$build" = "false" -a ! -z "$export_dir" ] ; then
@@ -88,7 +105,3 @@ if [ "$build" = "true" ] ; then
     fi
     cd $scriptdir
 fi
-
-
-
-
