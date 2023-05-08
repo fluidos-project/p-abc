@@ -84,7 +84,11 @@ if [ "$build" = "true" ] ; then
 	rm -rf build
     mkdir build
     cd build
-    cmake ..
+    if [ "$bits" = "32" ]; then
+        cmake -DWRAPPER_INSTANTIATION=pfec_Miracl_Bls381_32 ..
+    else
+        cmake -DWRAPPER_INSTANTIATION=pfec_Miracl_Bls381_64 ..
+    fi
     make
     if [ "$dotest" = "true" ] ; then
         echo "Testing"
