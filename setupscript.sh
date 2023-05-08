@@ -62,7 +62,7 @@ else
         mkdir build
         cd build
         cmake ..
-        sudo make install
+        make install
         cd $scriptdir 
         #Method 2, install package
         #sudo apt install libcmocka-dev
